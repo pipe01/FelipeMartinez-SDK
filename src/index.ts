@@ -193,7 +193,7 @@ export function createApi(token: string) {
             constructor() { super(`book/${id}`, client) }
 
             /**
-             * Request all chapters of one specific book.
+             * Request all chapters of a specific book.
              */
             chapters() {
                 return new ApiRequestMany<Chapter>(this.path + "/chapter", client);
@@ -211,7 +211,7 @@ export function createApi(token: string) {
             constructor() { super(`movie/${id}`, client) }
 
             /**
-             * Request all movie quotes for one specific movie (only working for the LotR trilogy).
+             * Request all movie quotes for a specific movie (only working for the LotR trilogy).
              */
             quotes() {
                 return new ApiRequestMany<Quote>(this.path + "/quote", client);
@@ -229,7 +229,7 @@ export function createApi(token: string) {
             constructor() { super(`character/${id}`, client) }
 
             /**
-             * Request all movie quotes of one specific character.
+             * Request all movie quotes of a specific character.
              */
             quotes() {
                 return new ApiRequestMany<Quote>(this.path + "/quote", client);
