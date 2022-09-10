@@ -1,12 +1,8 @@
-import axios from "axios";
+import axios, { AxiosInstance } from "axios";
 import { Book, Chapter, Character, Movie, Quote } from "./models";
 
 type ItemType<T> = T extends (infer TItem)[] ? TItem : T;
 type FieldOrRegex<T, Key extends keyof ItemType<T>> = ItemType<T>[Key] extends string ? (ItemType<T>[Key] | RegExp) : ItemType<T>[Key];
-
-const client = axios.create({
-    baseURL: "https://the-one-api.dev/v2"
-});
 
 type Response<T> = SuccessResponse<T> | FailedResponse;
 interface SuccessResponse<T> {
@@ -25,12 +21,12 @@ interface FailedResponse {
 abstract class ApiRequest<T> {
     protected readonly query = new URLSearchParams();
 
-    constructor(protected path: string) {
+    constructor(protected path: string, private client: AxiosInstance) {
     }
 
     protected async fetch(): Promise<Response<T>> {
         try {
-            const resp = await client.get(this.path);
+            const resp = await this.client.get(this.path, { params: this.query });
 
             return resp.data;
         } catch (e) {
@@ -120,40 +116,52 @@ class ApiRequestSingle<T> extends ApiRequest<T> {
     }
 }
 
-export const books = () => new ApiRequestMany<Book>("book");
-export const book = (id: string) => new class BookRequest extends ApiRequestSingle<Book> {
-    constructor() { super(`book/${id}`) }
+export function createApi(token: string) {
+    const client = axios.create({
+        baseURL: "https://the-one-api.dev/v2",
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    });
 
-    chapters() {
-        return new ApiRequestMany<Chapter>(this.path + "/chapter");
-    }
-};
+    return {
+        books: () => new ApiRequestMany<Book>("book", client),
+        book: (id: string) => new class BookRequest extends ApiRequestSingle<Book> {
+            constructor() { super(`book/${id}`, client) }
 
-export const movies = () => new ApiRequestMany<Movie>("movie");
-export const movie = (id: string) => new class MovieRequest extends ApiRequestSingle<Movie> {
-    constructor() { super(`movie/${id}`) }
+            chapters() {
+                return new ApiRequestMany<Chapter>(this.path + "/chapter", client);
+            }
+        },
 
-    quotes() {
-        return new ApiRequestMany<Quote>(this.path + "/quote");
+        movies: () => new ApiRequestMany<Movie>("movie", client),
+        movie: (id: string) => new class MovieRequest extends ApiRequestSingle<Movie> {
+            constructor() { super(`movie/${id}`, client) }
+
+            quotes() {
+                return new ApiRequestMany<Quote>(this.path + "/quote", client);
+            }
+        },
+
+        characters: () => new ApiRequestMany<Character>("character", client),
+        character: (id: string) => new class CharacterRequest extends ApiRequestSingle<Character> {
+            constructor() { super(`character/${id}`, client) }
+
+            quotes() {
+                return new ApiRequestMany<Quote>(this.path + "/quote", client);
+            }
+        },
+
+        quotes: () => new ApiRequestMany<Quote>("quote", client),
+        quote: (id: string) => new ApiRequestSingle<Quote>(`quote/${id}`, client),
+
+        chapters: () => new ApiRequestMany<Chapter>("chapter", client),
+        chapter: (id: string) => new ApiRequestSingle<Chapter>(`chapter/${id}`, client),
     }
 }
 
-export const characters = () => new ApiRequestMany<Character>("character");
-export const character = (id: string) => new class CharacterRequest extends ApiRequestSingle<Character> {
-    constructor() { super(`character/${id}`) }
-
-    quotes() {
-        return new ApiRequestMany<Quote>(this.path + "/quote");
-    }
-}
-
-export const quotes = () => new ApiRequestMany<Quote>("quote");
-export const quote = (id: string) => new ApiRequestSingle<Quote>(`quote/${id}`);
-
-export const chapters = () => new ApiRequestMany<Chapter>("chapter");
-export const chapter = (id: string) => new ApiRequestSingle<Chapter>(`chapter/${id}`);
-
-(async function() {
-    const gandalf = await characters().with("name", "==", "Gandalf").get();
+(async function () {
+    const api = createApi("")
+    const gandalf = await api.characters().with("name", "==", "Gandalf").get();
     console.log(gandalf);
 })();
