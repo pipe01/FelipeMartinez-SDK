@@ -113,10 +113,33 @@ class ApiRequestMany<T> extends ApiRequest<T> {
         return this;
     }
 
+    /**
+     * Gets a single page of items.
+     */
     async get(): Promise<T[]> {
         const { docs } = await this.fetch();
 
         return docs;
+    }
+
+    /**
+     * Gets all of the available items, fetching more pages if necessary.
+     */
+    async getAll(): Promise<T[]> {
+        const items: T[] = [];
+        let query = this;
+
+        while (true) {
+            const resp = await query.fetch();
+            items.push(...resp.docs);
+
+            if (resp.page == resp.pages)
+                break;
+
+            query = this.page(resp.page + 1) as this;
+        }
+
+        return items;
     }
 }
 
