@@ -31,8 +31,44 @@ class ApiRequestMany<T> extends ApiRequest<T> {
         return this;
     }
 
-    get(): Promise<T[]> {
-        return this.fetch();
+    with<TField extends keyof ItemType<T>>(field: TField, op: "in" | "not in", value: (ItemType<T>[TField])[]): this
+    with<TField extends keyof ItemType<T>>(field: TField, op: "==" | "!=", value: FieldOrRegex<T, TField>): this
+    with<TField extends keyof ItemType<T>>(field: TField, op: ItemType<T>[TField] extends number ? (">" | "<" | ">=" | "<=") : never, value: number): this
+
+    with<TField extends keyof ItemType<T>>(field: TField, op: "==" | "!=" | ">" | "<" | ">=" | "<=" | "in" | "not in", value: any): this {
+        const fieldStr = String(field);
+        const valueStr = String(value);
+
+        switch (op) {
+            case "==": // ?{name}={value}
+                this.query.set(fieldStr, valueStr);
+                break;
+            case "!=": // ?{name}!={value}
+                this.query.set(fieldStr + "!", valueStr);
+                break;
+
+            case ">": // ?{name}>{value}=
+            case "<": // ?{name}<{value}=
+                this.query.set(`${fieldStr}${op}${valueStr}`, "");
+                break;
+
+            case ">=": // ?{name}>={value}
+            case "<=": // ?{name}<={value}
+                this.query.set(fieldStr + op[0], valueStr);
+                break;
+        }
+
+        return this;
+    }
+    // 
+
+    async get(): Promise<T[]> {
+        const resp = await this.fetch();
+        if ("success" in resp) {
+            throw new Error(resp.message);
+        }
+
+        return resp.docs;
     }
 }
 
