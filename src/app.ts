@@ -4,7 +4,6 @@ import { Book, Chapter, Character, Movie, Quote } from "./models";
 type ItemType<T> = T extends (infer TItem)[] ? TItem : T;
 type FieldOrRegex<T, Key extends keyof ItemType<T>> = ItemType<T>[Key] extends string ? (ItemType<T>[Key] | RegExp) : ItemType<T>[Key];
 
-type Response<T> = SuccessResponse<T> | FailedResponse;
 interface SuccessResponse<T> {
     docs: T[];
     total: number;
@@ -24,7 +23,7 @@ abstract class ApiRequest<T> {
     constructor(protected path: string, private client: AxiosInstance) {
     }
 
-    protected async fetch(): Promise<Response<T>> {
+    protected async fetch(): Promise<SuccessResponse<T>> {
         try {
             const resp = await this.client.get(this.path, { params: this.query });
 
@@ -90,29 +89,22 @@ class ApiRequestMany<T> extends ApiRequest<T> {
 
         return this;
     }
-    // 
 
     async get(): Promise<T[]> {
-        const resp = await this.fetch();
-        if ("success" in resp) {
-            throw new Error(resp.message);
-        }
+        const { docs } = await this.fetch();
 
-        return resp.docs;
+        return docs;
     }
 }
 
 class ApiRequestSingle<T> extends ApiRequest<T> {
     async get(): Promise<T> {
-        const resp = await this.fetch();
-        if ("success" in resp) {
-            throw new Error(resp.message);
-        }
-        if (resp.docs.length == 0) {
+        const { docs } = await this.fetch();
+        if (docs.length == 0) {
             throw new Error("No items in response");
         }
 
-        return resp.docs[0];
+        return docs[0];
     }
 }
 
@@ -161,7 +153,7 @@ export function createApi(token: string) {
 }
 
 (async function () {
-    const api = createApi("")
+    const api = createApi(process.env.TOKEN);
     const gandalf = await api.characters().with("name", "==", "Gandalf").get();
     console.log(gandalf);
 })();
