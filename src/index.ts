@@ -91,7 +91,7 @@ class ApiRequestMany<T> extends ApiRequest<T> {
 
     with<TField extends keyof ItemType<T>>(field: TField, op: "==" | "!=" | ">" | "<" | ">=" | "<=" | "in" | "not in", value: any): this {
         const fieldStr = String(field);
-        const valueStr = String(value);
+        const valueStr = Array.isArray(value) ? value.join(",") : String(value);
 
         switch (op) {
             case "==": // ?{name}={value}
