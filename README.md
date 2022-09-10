@@ -30,4 +30,4 @@ const gandalf = await api.characters().with("name", "==", "Gandalf").get();
 
 To run the tests you must clone this repository, then run `pnpm i` or `npm i` to install all required dependencies.
 
-You can now run `pnpm test` or `npm run test` to run all tests. Note that you must provide an API key through the "TOKEN" environment variable.
+You can now run `pnpm test` or `npm test` to run all tests. Note that you must provide an API key through the "TOKEN" environment variable.
