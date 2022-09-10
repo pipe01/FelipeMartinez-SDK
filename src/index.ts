@@ -80,7 +80,7 @@ class ApiRequestMany<T> extends ApiRequest<T> {
      * @param field The field to sort by.
      * @param direction The direction to sort in.
      */
-    sort(field: keyof ItemType<T>, direction: "asc" | "desc"): Omit<this, "sort"> {
+    sort(field: keyof ItemType<T>, direction: "asc" | "desc" = "asc"): Omit<this, "sort"> {
         this.query.set("sort", `${String(field)}:${direction}`);
         return this;
     }
