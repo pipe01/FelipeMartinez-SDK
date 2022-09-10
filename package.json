@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "tsc && node dist/app.js",
+    "build": "tsup src/index.ts --dts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -15,6 +16,7 @@
     "typescript": "^4.8.3"
   },
   "devDependencies": {
-    "@types/node": "^18.7.16"
+    "@types/node": "^18.7.16",
+    "tsup": "^6.2.3"
   }
 }
