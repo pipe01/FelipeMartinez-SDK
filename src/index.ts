@@ -1,6 +1,8 @@
 import axios, { AxiosInstance } from "axios";
 import { Book, Chapter, Character, Movie, Quote } from "./models";
 
+export * from "./models"
+
 type ItemType<T> = T extends (infer TItem)[] ? TItem : T;
 type FieldOrRegex<T, Key extends keyof ItemType<T>> = ItemType<T>[Key] extends string ? (ItemType<T>[Key] | RegExp) : ItemType<T>[Key];
 
