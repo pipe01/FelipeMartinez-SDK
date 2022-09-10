@@ -85,6 +85,15 @@ class ApiRequestMany<T> extends ApiRequest<T> {
         return this;
     }
 
+    withExists<TField extends keyof ItemType<T>>(field: TField): this {
+        this.query.set(String(field), "");
+        return this;
+    }
+    withNotExists<TField extends keyof ItemType<T>>(field: TField): this {
+        this.query.set("!" + String(field), "");
+        return this;
+    }
+
     with<TField extends keyof ItemType<T>>(field: TField, op: "in" | "not in", value: (ItemType<T>[TField])[]): this
     with<TField extends keyof ItemType<T>>(field: TField, op: "==" | "!=", value: FieldOrRegex<T, TField>): this
     with<TField extends keyof ItemType<T>>(field: TField, op: ItemType<T>[TField] extends number ? (">" | "<" | ">=" | "<=") : never, value: number): this
