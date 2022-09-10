@@ -1,5 +1,7 @@
 # Lord of the Rings SDK
 
+[![npm version](https://badge.fury.io/js/@pipe01%2Fthe-one-sdk.svg)](https://badge.fury.io/js/@pipe01%2Fthe-one-sdk)
+
 This SDK wraps the public [The One API](https://the-one-api.dev) and provides an easy way to query all of the available data.
 
 By Felipe Martínez Tabaco.
