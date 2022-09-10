@@ -23,12 +23,12 @@ interface FailedResponse {
  * Base class for all requests, handles sending request and parsing the response.
  */
 abstract class ApiRequest<T> {
-    protected readonly query = new URLSearchParams();
+    readonly query = new URLSearchParams();
 
-    constructor(protected path: string, private client: AxiosInstance) {
+    constructor(public path: string, public client: AxiosInstance) {
     }
 
-    protected async fetch(): Promise<SuccessResponse<T>> {
+    async fetch(): Promise<SuccessResponse<T>> {
         try {
             const resp = await this.client.get(this.path, { params: this.query });
 
