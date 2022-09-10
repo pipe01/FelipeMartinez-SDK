@@ -247,6 +247,8 @@ export function createApi(token: string) {
 
 (async function () {
     const api = createApi(process.env.TOKEN);
-    const gandalf = await api.characters().with("name", "==", "Gandalf").get();
-    console.log(gandalf);
+    console.log(await api.quotes().getAll());
+
+    // const gandalf = await api.characters().with("name", "==", "Gandalf").get();
+    // console.log(gandalf);
 })();
