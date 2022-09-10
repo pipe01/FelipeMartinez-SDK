@@ -246,11 +246,3 @@ export function createApi(token: string) {
         chapter: (id: string) => new ApiRequestSingle<Chapter>(`chapter/${id}`, client),
     }
 }
-
-(async function () {
-    const api = createApi(process.env.TOKEN);
-    console.log(await api.quotes().getAll());
-
-    // const gandalf = await api.characters().with("name", "==", "Gandalf").get();
-    // console.log(gandalf);
-})();
